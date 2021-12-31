@@ -10,7 +10,19 @@ import (
 
 var addr = flag.String("addr", ":8081", "http service address")
 
-const letterBytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+var (
+	Servers = make(map[string]*Ws)
+)
+
+type NewTableResponse struct {
+	Id string `json:"id"`
+}
+
+type WsErrorResponse struct {
+	Message string `json:"message"`
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyz"
 
 func generateTableId(n int) string {
 	seed := rand.NewSource(time.Now().UnixNano())
@@ -24,11 +36,25 @@ func generateTableId(n int) string {
 
 func main() {
 	flag.Parse()
-	serv := gin.Default()
-	serv.SetTrustedProxies([]string{"192.168.0.0/24"})
+	router := gin.Default()
+	router.SetTrustedProxies([]string{"192.168.0.0/24"})
 
-	serv.GET("/new_game", func(c *gin.Context) {
+	Servers["test"] = NewServer("test")
+	go Servers["test"].run()
+
+	router.GET("/new_game", func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "localhost:3000")
 		tableId := generateTableId(3)
+		Servers[tableId] = NewServer(tableId)
+		if ws, ok := Servers[tableId]; ok {
+			go ws.run()
+		}
+		c.JSON(200, NewTableResponse{Id: tableId})
 	})
+
+	router.GET("/ws", func(c *gin.Context) {
+		serveWs(c.Writer, c.Request)
+	})
+
+	router.Run(*addr)
 }

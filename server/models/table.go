@@ -9,7 +9,7 @@ type Table struct {
 	Pot       int                `json:"pot"`
 }
 
-func newTable(id string) *Table {
+func NewTable(id string) *Table {
 	return &Table{
 		Id:        id,
 		HasHost:   false,
@@ -18,4 +18,23 @@ func newTable(id string) *Table {
 		Dealer:    "",
 		Pot:       0,
 	}
+}
+
+func (t *Table) AddPlayer(name string) bool {
+	make_host := len(t.Players) == 0
+	if _, ok := t.Players[name]; ok {
+		return false
+	} else {
+		t.Players[name] = &Player{
+			Name:   name,
+			IsHost: make_host,
+		}
+		return true
+	}
+}
+
+func (t *Table) RemovePlayer(name string) bool {
+	_, ok := t.Players[name]
+	delete(t.Players, name)
+	return ok
 }
