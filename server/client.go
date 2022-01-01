@@ -46,7 +46,7 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				log.Printf("Socket closed: %v", err)
 			}
 			break
 		}
@@ -98,7 +98,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	if ws, ok := Servers[tableId]; ok {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println(err)
+			log.Printf("couldn't upgrade connection: %#v", err)
 			return
 		}
 		client := &Client{ws: ws, conn: conn, send: make(chan []byte, 256)}

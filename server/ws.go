@@ -30,13 +30,18 @@ func (ws *Ws) run() {
 	for {
 		select {
 		case client := <-ws.register:
+			log.Println("Register client")
 			ws.clients[client] = true
 		case client := <-ws.unregister:
+			log.Println("Unregister client")
 			if _, ok := ws.clients[client]; ok {
 				delete(ws.clients, client)
 				close(client.send)
 			}
 			if len(ws.clients) == 0 {
+				if ws.table.Id == "test" {
+					continue
+				}
 				log.Println("Quitting due to no more players in lobby")
 				delete(Servers, ws.table.Id)
 				return
