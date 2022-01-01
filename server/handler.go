@@ -47,7 +47,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 		res.Dealer = t.Dealer
 		res.Message = "current gamestate"
 	default:
-		res.Message = "Unknown action: " + req.Action
+		res.Message = "Unknown action: " + req.Action + " :: " + string(r)
 	}
 
 	res.Players = t.Players

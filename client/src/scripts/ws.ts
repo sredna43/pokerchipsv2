@@ -15,10 +15,15 @@ export const connect = (tableId): void => {
 
         socket.addEventListener('open', (e: MessageEvent) => {
             console.log('opened websocket')
+            messageStore.set('')
         })
 
         socket.addEventListener('message', (e: MessageEvent) => {
             messageStore.set(e.data)
+        })
+
+        socket.addEventListener('close', () => {
+            messageStore.set('DISCONNECTED')
         })
     }
 }
