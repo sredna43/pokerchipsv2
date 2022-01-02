@@ -13,6 +13,7 @@ type Request struct {
 }
 
 type Response struct {
+	Requester string                    `json:"requester"`
 	Players   map[string]*models.Player `json:"players"`
 	Message   string                    `json:"message"`
 	Pot       int                       `json:"pot"`
@@ -27,6 +28,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 	if err := json.Unmarshal(r, req); err != nil {
 		res.Message = "Error: " + err.Error()
 	}
+	res.Requester = req.PlayerName
 
 	switch req.Action {
 	case "add_player":
@@ -41,7 +43,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 			res.Message = "Player " + req.PlayerName + " doesn't exist"
 			res.Error = true
 		} else {
-			res.Message = req.PlayerName + " removed"
+			res.Message = req.PlayerName + " left"
 		}
 	case "game_state":
 		res.Players = t.Players

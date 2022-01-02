@@ -22,6 +22,10 @@ type WsErrorResponse struct {
 	Message string `json:"message"`
 }
 
+type CheckLobbyResponse struct {
+	Exists bool `json:"exists"`
+}
+
 const letterBytes = "abcdefghijklmnopqrstuvwxyz"
 
 func generateTableId(n int) string {
@@ -34,22 +38,39 @@ func generateTableId(n int) string {
 	return string(b)
 }
 
+func resetTestServer() {
+	Servers["test"] = NewServer("test")
+	go Servers["test"].run()
+}
+
 func main() {
 	flag.Parse()
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"192.168.0.0/24"})
 
-	Servers["test"] = NewServer("test")
-	go Servers["test"].run()
+	resetTestServer()
+
+	router.GET("/reset_test", func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		resetTestServer()
+		c.JSON(200, "DONE")
+	})
 
 	router.GET("/new_game", func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		tableId := generateTableId(3)
 		Servers[tableId] = NewServer(tableId)
 		if ws, ok := Servers[tableId]; ok {
 			go ws.run()
 		}
-		c.JSON(200, NewTableResponse{Id: tableId})
+		c.JSON(200, &NewTableResponse{Id: tableId})
+	})
+
+	router.GET("/table/:tableId", func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		tableId := c.Param("tableId")
+		_, ok := Servers[tableId]
+		c.JSON(200, &CheckLobbyResponse{Exists: ok})
 	})
 
 	router.GET("/ws", func(c *gin.Context) {

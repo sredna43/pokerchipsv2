@@ -1,14 +1,12 @@
 import { browser } from '$app/env';
-import { serverRes } from './appState';
-import type { Request as R } from './models';
+import type { TableCheckResponse, Req, Res } from './models';
+import { sResponse } from './store';
 
 let socket: WebSocket;
 const host = 'localhost:8081';
 
-export function sendAction(req: R): void {
-	if (socket.readyState === WebSocket.OPEN && browser) {
-		socket.send(JSON.stringify(req));
-	}
+export function sendAction(r: Req): void {
+	sendMessage(JSON.stringify(r));
 }
 
 export function connect(tableId: string): void {
@@ -17,15 +15,15 @@ export function connect(tableId: string): void {
 
 		socket.addEventListener('open', (e: MessageEvent) => {
 			console.log('opened websocket', e);
-			serverRes.set({});
+			parseResponse(`{ "message": "CONNECTED" }`);
 		});
 
 		socket.addEventListener('message', (e: MessageEvent) => {
-			serverRes.set(JSON.parse(e.data));
+			parseResponse(e.data);
 		});
 
 		socket.addEventListener('close', () => {
-			serverRes.set({ message: 'DISCONNECTED' });
+			parseResponse(`{ "message": "DISCONNECTED" }`);
 		});
 	}
 }
@@ -36,5 +34,24 @@ export function disconnect(): void {
 		socket.close();
 	} catch (error) {
 		console.error(`Failed to disconnect: ${error.Message}`);
+	}
+}
+
+export async function getTableExists(tid: string): Promise<boolean> {
+	const response = await fetch(`http://${host}/table/${tid}`);
+	const json: TableCheckResponse = await response.json();
+    return json.exists;
+}
+
+function parseResponse(m: string): void {
+	console.log(m);
+	const r: Res = JSON.parse(m);
+	console.log(r);
+	sResponse.set(r);
+}
+
+function sendMessage(m: string): void {
+	if (socket.readyState === WebSocket.OPEN && browser) {
+		socket.send(m);
 	}
 }

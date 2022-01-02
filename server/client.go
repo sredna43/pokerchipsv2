@@ -20,7 +20,7 @@ const (
 	pongWait       = 60 * time.Second
 	pingPeriod     = (pongWait * 9) / 10
 	maxMessageSize = 512
-	allowedOrigin  = "http://192.168.0.12:3000"
+	allowedOrigin  = "http://localhost:3000"
 )
 
 var upgrader = websocket.Upgrader{
