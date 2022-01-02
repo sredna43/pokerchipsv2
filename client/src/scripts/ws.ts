@@ -1,44 +1,40 @@
-import { writable } from 'svelte/store'
-import { browser } from '$app/env'
+import { browser } from '$app/env';
+import { serverRes } from './appState';
+import type { Request as R } from './models';
 
-export const messageStore = writable('')
+let socket: WebSocket;
+const host = 'localhost:8081';
 
-let socket: WebSocket
-
-const getServerAddress = (tableId: string): string => {
-    return `ws://localhost:8081/ws?${tableId}`
+export function sendAction(req: R): void {
+	if (socket.readyState === WebSocket.OPEN && browser) {
+		socket.send(JSON.stringify(req));
+	}
 }
 
-export const connect = (tableId): void => {
-    if (browser) {
-        socket = new WebSocket(getServerAddress(tableId))
+export function connect(tableId: string): void {
+	if (browser) {
+		socket = new WebSocket(`ws://${host}/ws?${tableId}`);
 
-        socket.addEventListener('open', (e: MessageEvent) => {
-            console.log('opened websocket')
-            messageStore.set('')
-        })
+		socket.addEventListener('open', (e: MessageEvent) => {
+			console.log('opened websocket', e);
+			serverRes.set({});
+		});
 
-        socket.addEventListener('message', (e: MessageEvent) => {
-            messageStore.set(e.data)
-        })
+		socket.addEventListener('message', (e: MessageEvent) => {
+			serverRes.set(JSON.parse(e.data));
+		});
 
-        socket.addEventListener('close', () => {
-            messageStore.set('DISCONNECTED')
-        })
-    }
+		socket.addEventListener('close', () => {
+			serverRes.set({ message: 'DISCONNECTED' });
+		});
+	}
 }
 
-export const disconnect = (): void => {
-    try {
-        console.log('Closing socket connection')
-        socket.close()
-    } catch (error) {
-        console.error(`Failed to disconnect: ${error.Message}`)
-    }
-}
-
-export const sendMessage = (m): void => {
-    if (socket.readyState === WebSocket.OPEN && browser) {
-        socket.send(m)
-    }
+export function disconnect(): void {
+	try {
+		console.log('Closing socket connection');
+		socket.close();
+	} catch (error) {
+		console.error(`Failed to disconnect: ${error.Message}`);
+	}
 }

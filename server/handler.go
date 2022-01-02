@@ -7,7 +7,7 @@ import (
 )
 
 type Request struct {
-	PlayerName string `json:"player_name"`
+	PlayerName string `json:"name"`
 	Action     string `json:"action"`
 	Amount     int    `json:"amount"`
 }
@@ -18,11 +18,12 @@ type Response struct {
 	Pot       int                       `json:"pot"`
 	WhoseTurn string                    `json:"whose_turn"`
 	Dealer    string                    `json:"dealer"`
+	Error     bool                      `json:"error"`
 }
 
 func handleRequest(t *models.Table, r []byte) []byte {
 	req := &Request{}
-	res := &Response{}
+	res := &Response{Error: false}
 	if err := json.Unmarshal(r, req); err != nil {
 		res.Message = "Error: " + err.Error()
 	}
@@ -31,12 +32,14 @@ func handleRequest(t *models.Table, r []byte) []byte {
 	case "add_player":
 		if !t.AddPlayer(req.PlayerName) {
 			res.Message = "Player " + req.PlayerName + " already exists"
+			res.Error = true
 		} else {
 			res.Message = req.PlayerName + " joined"
 		}
 	case "remove_player":
 		if !t.RemovePlayer(req.PlayerName) {
 			res.Message = "Player " + req.PlayerName + " doesn't exist"
+			res.Error = true
 		} else {
 			res.Message = req.PlayerName + " removed"
 		}
@@ -48,6 +51,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 		res.Message = "current gamestate"
 	default:
 		res.Message = "Unknown action: " + req.Action + " :: " + string(r)
+		res.Error = true
 	}
 
 	res.Players = t.Players

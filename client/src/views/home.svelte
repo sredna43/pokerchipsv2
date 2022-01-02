@@ -1,15 +1,16 @@
 <script lang="ts">
     import { tableId } from '../scripts/appState'
+    import Button from '../components/button.svelte'
+    import Input from '../components/input.svelte'
     let tid: string = ''
 
     function handleJoin(): void {
-        console.log("Joining table " + tid)
         tableId.set(tid)
     }
 </script>
 
 <div>
-    <button>host</button>
-    <input bind:value={tid}>
-    <button on:click={handleJoin}>join</button>
+    <Button text="Host" />
+    <Input bind:val={tid} />
+    <Button text="Join" onClick={handleJoin} />
 </div>
