@@ -24,6 +24,10 @@
 				view = 'home';
 				break;
 			}
+            case 'START_GAME': {
+                view = 'table';
+                break;
+            }
 			default: {
 				break;
 			}

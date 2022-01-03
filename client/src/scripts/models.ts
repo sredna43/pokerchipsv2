@@ -1,6 +1,6 @@
 export interface Res {
     requester: string;
-    players: Map<string, Player>;
+    players: Players;
     message: string;
     pot: number;
     whose_turn: string;
@@ -18,6 +18,11 @@ export interface Player {
     name: string;
     is_host: boolean;
     chips: number;
+    spot: number;
+}
+
+export interface Players {
+    [key: string]: Player;
 }
 
 export interface TableCheckResponse {

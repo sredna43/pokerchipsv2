@@ -3,7 +3,7 @@ import type { TableCheckResponse, Req, Res } from './models';
 import { sResponse } from './store';
 
 let socket: WebSocket;
-const host = 'localhost:8081';
+const host = '192.168.0.12:8081';
 
 export function sendAction(r: Req): void {
 	sendMessage(JSON.stringify(r));

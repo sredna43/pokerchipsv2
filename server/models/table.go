@@ -28,6 +28,7 @@ func (t *Table) AddPlayer(name string) bool {
 		t.Players[name] = &Player{
 			Name:   name,
 			IsHost: make_host,
+			Spot:   len(t.Players),
 		}
 		return true
 	}

@@ -1,4 +1,5 @@
 <script>
+    export let ref = null;
     export let val = '';
     export let helperText = '';
     export let className = '';
@@ -10,4 +11,4 @@
     }
 </script>
 
-<input bind:value={val} placeholder={helperText} class={className} on:keyup={keyUp}>
+<input bind:value={val} placeholder={helperText} class={className} on:keyup={keyUp} bind:this={ref}>

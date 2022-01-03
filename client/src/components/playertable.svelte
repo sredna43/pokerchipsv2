@@ -1,11 +1,11 @@
 <script lang="ts">
-    export let players: string[];
+	export let displayNames: string[];
 </script>
 
 <div>
-    <ul>
-        {#each players as p}
-            <li>{p}</li>
-        {/each}
-    </ul>
+	<ul>
+		{#each displayNames as name}
+			<li>{name}</li>
+		{/each}
+	</ul>
 </div>

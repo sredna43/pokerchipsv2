@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/sredna43/pokerchipsv2/models"
 )
@@ -45,6 +46,16 @@ func handleRequest(t *models.Table, r []byte) []byte {
 		} else {
 			res.Message = req.PlayerName + " left"
 		}
+	case "set_dealer":
+		t.Dealer = req.PlayerName
+		res.Message = req.PlayerName + " is now dealer"
+	case "set_spot":
+		if player, ok := t.Players[req.PlayerName]; ok {
+			player.Spot = req.Amount
+			res.Message = fmt.Sprintf("Set %s's spot to %d", req.PlayerName, req.Amount)
+		}
+	case "start_game":
+		res.Message = "START_GAME"
 	case "game_state":
 		res.Players = t.Players
 		res.Pot = t.Pot
