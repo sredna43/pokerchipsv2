@@ -1,32 +1,26 @@
 <script lang="ts">
 	import Playertable from '../components/playertable.svelte';
-    import Button from '../components/button.svelte';
-    import { sResponse, myName } from '../scripts/store';
-    import { sendAction } from '../scripts/ws'
+	import Button from '../components/button.svelte';
+	import { sResponse, myName } from '../scripts/store';
+	import { sendAction } from '../scripts/ws';
+	import type { Player } from 'src/scripts/models';
 
 	let name: string;
 	myName.subscribe((n) => {
 		name = n;
 	});
 
-    let displayNames: string[];
+	let players: Player[];
 	sResponse.subscribe((r) => {
-        if (r.players) {
-            let names = Object.keys(r.players);
-			displayNames = names.map((name): string => {
-				let displayName = name;
-				if (name === r.dealer) {
-					displayName += ' (dealer)';
-				}
-                if (name === r.whose_turn) {
-                    displayName = '* ' + displayName
-                }
-				return displayName;
-			});
-        }
-    });
+		if (r.players) {
+			const names = Object.keys(r.players);
+			players = names.map((name): Player => {
+				return r.players[name];
+			})
+		}
+	});
 
-    function handleLeave(): void {
+	function handleLeave(): void {
 		sendAction({ action: 'remove_player', name, amount: 0 });
 	}
 </script>
@@ -34,4 +28,4 @@
 <p>Table</p>
 <p>{name}</p>
 <Button text="Leave" onClick={handleLeave} />
-<Playertable bind:displayNames />
+<Playertable bind:players view="table" />

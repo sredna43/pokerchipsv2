@@ -3,7 +3,7 @@ export interface Res {
     players: Players;
     message: string;
     pot: number;
-    whose_turn: string;
+    whose_turn: number;
     dealer: string;
     error: boolean;
 }

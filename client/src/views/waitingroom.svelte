@@ -3,7 +3,7 @@
 	import Playertable from '../components/playertable.svelte';
 	import { tableId, myName, sResponse, isHost } from '../scripts/store';
 	import { sendAction } from '../scripts/ws';
-    import { sortBy } from 'lodash'
+	import type { Player } from 'src/scripts/models';
 
 	let tid: string;
 	tableId.subscribe((v) => {
@@ -16,27 +16,23 @@
 	});
 
 	let host = false;
-    let displayNames: string[];
+	let players: Player[];
 	sResponse.subscribe((r) => {
 		if (r.players && r.players[name]?.is_host) {
 			isHost.set(true);
 			host = true;
 		}
-        if (r.players) {
-			let names = Object.keys(r.players);
-			displayNames = names.map((name): string => {
-				let displayName = name;
-				if (r.players[name]?.is_host) {
-					displayName += ' (host)';
-				}
-				return displayName;
-			});
+		if (r.players) {
+			const names = Object.keys(r.players);
+			players = names.map((name): Player => {
+				return r.players[name];
+			})
 		}
 	});
 
-    function handleStart(): void {
-        sendAction({action: 'start_game', name, amount: 0});
-    }
+	function handleStart(): void {
+		sendAction({ action: 'start_game', name, amount: 0 });
+	}
 
 	function handleLeave(): void {
 		sendAction({ action: 'remove_player', name, amount: 0 });
@@ -47,9 +43,9 @@
 
 <p>Waiting Room</p>
 <p>Table ID: {tid}</p>
-<p>You are {name}{host ? ' and you are host' : ''}</p>
+<p>You are {name}{host ? ' and you are host' : ', waiting for host to start game'}</p>
 {#if host}
-    <Button text="Start Game" onClick={handleStart} />
+	<Button text="Start Game" onClick={handleStart} />
 {/if}
-<Playertable bind:displayNames/>
+<Playertable bind:players mutable={host}/>
 <Button text="Leave" onClick={handleLeave} />
