@@ -16,6 +16,7 @@
 		name = v;
 	});
 
+	let initialChips: string;
 	let host = false;
 	let players: Player[];
 	let dealer: string;
@@ -34,14 +35,13 @@
 	});
 
 	function handleStart(): void {
-		if (dealer !== '') {
+		if (dealer !== '' && initialChips !== '') {
 			sendAction({ action: 'start_game', name, amount: 0 });
 		} else {
-			console.log("Need to specify first dealer")
+			console.log("Need to specify first dealer and initial chips")
 		}
 	}
 
-	let initialChips: string;
 	function handleInitialChips(): void {
 		if (Number(initialChips) > 0){
 			sendAction({ action: 'set_initial_chips', name, amount: Number(initialChips)})
