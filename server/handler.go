@@ -18,7 +18,7 @@ type Response struct {
 	Players   map[string]*models.Player `json:"players"`
 	Message   string                    `json:"message"`
 	Pot       int                       `json:"pot"`
-	WhoseTurn string                    `json:"whose_turn"`
+	WhoseTurn int                       `json:"whose_turn"`
 	Dealer    string                    `json:"dealer"`
 	Error     bool                      `json:"error"`
 }
@@ -56,6 +56,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 		}
 	case "start_game":
 		res.Message = "START_GAME"
+		t.WhoseTurn = 0
 	case "game_state":
 		res.Players = t.Players
 		res.Pot = t.Pot
