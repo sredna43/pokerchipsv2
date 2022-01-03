@@ -17,6 +17,7 @@
 
 	let host = false;
 	let players: Player[];
+	let dealer: string;
 	sResponse.subscribe((r) => {
 		if (r.players && r.players[name]?.is_host) {
 			isHost.set(true);
@@ -28,10 +29,15 @@
 				return r.players[name];
 			})
 		}
+		dealer = r.dealer;
 	});
 
 	function handleStart(): void {
-		sendAction({ action: 'start_game', name, amount: 0 });
+		if (dealer !== '') {
+			sendAction({ action: 'start_game', name, amount: 0 });
+		} else {
+			console.log("Need to specify first dealer")
+		}
 	}
 
 	function handleLeave(): void {

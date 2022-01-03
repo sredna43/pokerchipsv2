@@ -33,30 +33,47 @@ func handleRequest(t *models.Table, r []byte) []byte {
 
 	switch req.Action {
 	case "add_player":
-		if !t.AddPlayer(req.PlayerName) {
-			res.Message = "Player " + req.PlayerName + " already exists"
-			res.Error = true
+		if t.AddPlayer(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s joined", req.PlayerName)
 		} else {
-			res.Message = req.PlayerName + " joined"
+			res.Message = fmt.Sprintf("Player %s already exists", req.PlayerName)
+			res.Error = true
 		}
 	case "remove_player":
-		if !t.RemovePlayer(req.PlayerName) {
-			res.Message = "Player " + req.PlayerName + " doesn't exist"
-			res.Error = true
+		if t.RemovePlayer(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s left", req.PlayerName)
 		} else {
-			res.Message = req.PlayerName + " left"
+			res.Message = fmt.Sprintf("Player %s doesn't exist", req.PlayerName)
+			res.Error = true
 		}
 	case "set_dealer":
-		t.Dealer = req.PlayerName
-		res.Message = req.PlayerName + " is now dealer"
-	case "set_spot":
-		if player, ok := t.Players[req.PlayerName]; ok {
-			player.Spot = req.Amount
-			res.Message = fmt.Sprintf("Set %s's spot to %d", req.PlayerName, req.Amount)
+		if t.SetDealer(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s is now dealer", req.PlayerName)
+		} else {
+			res.Message = fmt.Sprintf("Could not make %s dealer", req.PlayerName)
+			res.Error = true
+		}
+	case "move_player":
+		if t.MovePlayer(req.PlayerName, req.Amount) {
+			res.Message = fmt.Sprintf("Moved player %s", req.PlayerName)
+		} else {
+			res.Message = fmt.Sprintf("Could not move player %s", req.PlayerName)
+			res.Error = true
+		}
+	case "set_initial_chips":
+		if t.SetInitialChips(req.Amount) {
+			res.Message = fmt.Sprintf("Set initial chips to %d", req.Amount)
+		} else {
+			res.Message = fmt.Sprintf("Could not set initial chips to %d", req.Amount)
+			res.Error = true
 		}
 	case "start_game":
-		res.Message = "START_GAME"
-		t.WhoseTurn = 0
+		if t.StartGame() {
+			res.Message = "START_GAME"
+		} else {
+			res.Message = "Could not start game, already playing"
+			res.Error = true
+		}
 	case "game_state":
 		res.Players = t.Players
 		res.Pot = t.Pot
@@ -69,6 +86,9 @@ func handleRequest(t *models.Table, r []byte) []byte {
 	}
 
 	res.Players = t.Players
+	res.Dealer = t.Dealer
+	res.Pot = t.Pot
+	res.WhoseTurn = t.WhoseTurn
 
 	if b, err := json.Marshal(res); err != nil {
 		return []byte("Error building response")

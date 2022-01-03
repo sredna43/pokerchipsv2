@@ -7,6 +7,7 @@ type Table struct {
 	WhoseTurn int                `json:"whose_turn"`
 	Dealer    string             `json:"dealer"`
 	Pot       int                `json:"pot"`
+	Playing   bool               `json:"playing"`
 }
 
 func NewTable(id string) *Table {
@@ -17,6 +18,7 @@ func NewTable(id string) *Table {
 		WhoseTurn: 0,
 		Dealer:    "",
 		Pot:       0,
+		Playing:   false,
 	}
 }
 
@@ -49,4 +51,53 @@ func (t *Table) RemovePlayer(name string) bool {
 	}
 	delete(t.Players, name)
 	return ok
+}
+
+func (t *Table) MovePlayer(name string, direction int) bool {
+	if player, ok := t.Players[name]; ok {
+		if player.Spot+direction < 0 || player.Spot+direction >= len(t.Players) {
+			return false
+		}
+		oldSpot := player.Spot
+		newSpot := player.Spot + direction
+		for _, p := range t.Players {
+			if p.Spot == newSpot {
+				p.Spot = oldSpot
+			}
+			if p.Name == player.Name {
+				p.Spot = newSpot
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (t *Table) SetInitialChips(amount int) bool {
+	if t.Playing || amount < 0 {
+		return false
+	}
+	for _, p := range t.Players {
+		p.Chips = amount
+	}
+	return true
+}
+
+func (t *Table) SetDealer(newDealer string) bool {
+	if _, ok := t.Players[newDealer]; ok {
+		t.Dealer = newDealer
+		return true
+	}
+	return false
+}
+
+func (t *Table) StartGame() bool {
+	if !t.Playing {
+		t.WhoseTurn = 0
+		t.Pot = 0
+		t.Playing = true
+		return true
+	} else {
+		return false
+	}
 }

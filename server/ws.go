@@ -40,6 +40,7 @@ func (ws *Ws) run() {
 			}
 			if len(ws.clients) == 0 {
 				if ws.table.Id == "test" {
+					ws.table.Playing = false
 					continue
 				}
 				log.Println("Quitting due to no more players in lobby")

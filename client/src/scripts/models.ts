@@ -1,11 +1,11 @@
 export interface Res {
-    requester: string;
-    players: Players;
-    message: string;
-    pot: number;
-    whose_turn: number;
-    dealer: string;
-    error: boolean;
+	requester: string;
+	players: Players;
+	message: string;
+	pot: number;
+	whose_turn: number;
+	dealer: string;
+	error: boolean;
 }
 
 export interface Req {
@@ -15,16 +15,17 @@ export interface Req {
 }
 
 export interface Player {
-    name: string;
-    is_host: boolean;
-    chips: number;
-    spot: number;
+	name: string;
+	is_host: boolean;
+	is_dealer: boolean;
+	chips: number;
+	spot: number;
 }
 
 export interface Players {
-    [key: string]: Player;
+	[key: string]: Player;
 }
 
 export interface TableCheckResponse {
-    exists: boolean;
+	exists: boolean;
 }
