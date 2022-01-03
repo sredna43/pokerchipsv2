@@ -84,8 +84,12 @@ func (t *Table) SetInitialChips(amount int) bool {
 }
 
 func (t *Table) SetDealer(newDealer string) bool {
-	if _, ok := t.Players[newDealer]; ok {
+	if p, ok := t.Players[t.Dealer]; ok {
+		p.IsDealer = false
+	}
+	if p, ok := t.Players[newDealer]; ok {
 		t.Dealer = newDealer
+		p.IsDealer = true
 		return true
 	}
 	return false

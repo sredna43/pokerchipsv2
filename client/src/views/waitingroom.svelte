@@ -4,6 +4,7 @@
 	import { tableId, myName, sResponse, isHost } from '../scripts/store';
 	import { sendAction } from '../scripts/ws';
 	import type { Player } from 'src/scripts/models';
+	import Input from '../components/input.svelte';
 
 	let tid: string;
 	tableId.subscribe((v) => {
@@ -40,6 +41,13 @@
 		}
 	}
 
+	let initialChips: string;
+	function handleInitialChips(): void {
+		if (Number(initialChips) > 0){
+			sendAction({ action: 'set_initial_chips', name, amount: Number(initialChips)})
+		}
+	}
+
 	function handleLeave(): void {
 		sendAction({ action: 'remove_player', name, amount: 0 });
 	}
@@ -52,6 +60,8 @@
 <p>You are {name}{host ? ' and you are host' : ', waiting for host to start game'}</p>
 {#if host}
 	<Button text="Start Game" onClick={handleStart} />
+	<Button text="Set Initial Chips" onClick={handleInitialChips} />
+	<Input bind:val={initialChips} helperText="Initial chips" />
 {/if}
 <Playertable bind:players mutable={host}/>
 <Button text="Leave" onClick={handleLeave} />

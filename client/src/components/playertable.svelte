@@ -8,15 +8,15 @@
 	export let view = 'waitingroom';
 	export let mutable = false;
 
-	function arrowPressed(name: string, spot: number, direction: number) {
+	function arrowPressed(name: string, direction: number): void {
 		sendAction({ action: 'move_player', name, amount: direction });
 	}
 
-	function makeDealer(name: string) {
+	function makeDealer(name: string): void {
 		sendAction({ action: 'set_dealer', name, amount: 0 });
 	}
 
-	function kick(name: string) {
+	function kick(name: string): void {
 		sendAction({ action: 'remove_player', name, amount: 0 });
 	}
 </script>
@@ -32,23 +32,24 @@
 					<button
 						class="arrow"
 						on:click={() => {
-							arrowPressed(name, spot, -1);
+							arrowPressed(name, -1);
 						}}><Icon icon="ic:sharp-arrow-drop-up" inline={true} /></button
 					>
 					<button
 						class="arrow"
 						on:click={() => {
-							arrowPressed(name, spot, 1);
+							arrowPressed(name, 1);
 						}}><Icon icon="ic:baseline-arrow-drop-down" inline={false} /></button
 					>
-					Seat {spot + 1}: {name}
-					{is_dealer ? 'First dealer' : ''}
+					Seat {spot + 1}: {name} {is_dealer ? ' - First Dealer' : ''}
+					{#if !is_dealer}
 					<button
 						class="dealer"
 						on:click={() => {
 							makeDealer(name);
 						}}>Make First Dealer</button
 					>
+					{/if}
 					{#if !is_host}
 						<button class="kick" on:click={() => kick(name)}>kick</button>
 						{/if}
