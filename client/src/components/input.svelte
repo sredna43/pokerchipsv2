@@ -12,3 +12,9 @@
 </script>
 
 <input bind:value={val} placeholder={helperText} class={className} on:keyup={keyUp} bind:this={ref}>
+
+<style>
+    .uppercase {
+        text-transform: uppercase;
+    }
+</style>

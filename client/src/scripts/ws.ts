@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import type { TableCheckResponse, Req, Res } from './models';
+import type { TableCheckResponse, Req, Res, NewTableResponse } from './models';
 import { sResponse } from './store';
 
 let socket: WebSocket;
@@ -13,8 +13,7 @@ export function connect(tableId: string): void {
 	if (browser) {
 		socket = new WebSocket(`ws://${host}/ws?${tableId}`);
 
-		socket.addEventListener('open', (e: MessageEvent) => {
-			console.log('opened websocket', e);
+		socket.addEventListener('open', () => {
 			parseResponse(`{ "message": "CONNECTED" }`);
 		});
 
@@ -30,7 +29,6 @@ export function connect(tableId: string): void {
 
 export function disconnect(): void {
 	try {
-		console.log('Closing socket connection');
 		socket.close();
 	} catch (error) {
 		console.error(`Failed to disconnect: ${error.Message}`);
@@ -41,6 +39,12 @@ export async function getTableExists(tid: string): Promise<boolean> {
 	const response = await fetch(`http://${host}/table/${tid}`);
 	const json: TableCheckResponse = await response.json();
     return json.exists;
+}
+
+export async function getNewGame(): Promise<string> {
+	const response = await fetch(`http://${host}/new_game`);
+	const json: NewTableResponse = await response.json();
+	return json.id;
 }
 
 function parseResponse(m: string): void {

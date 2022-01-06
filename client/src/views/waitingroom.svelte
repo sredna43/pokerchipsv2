@@ -21,24 +21,25 @@
 	let players: Player[];
 	let dealer: string;
 	sResponse.subscribe((r) => {
-		if (r.players && r.players[name]?.is_host) {
+		if (r.table?.players && r.table.players[name]?.is_host) {
 			isHost.set(true);
 			host = true;
 		}
-		if (r.players) {
-			const names = Object.keys(r.players);
+		if (r.table?.players) {
+			const names = Object.keys(r.table.players);
 			players = names.map((name): Player => {
-				return r.players[name];
+				return r.table.players[name];
 			})
+			dealer = r.table.dealer;
+			initialChips = String(r.table.initial_chips)
 		}
-		dealer = r.dealer;
 	});
 
 	function handleStart(): void {
-		if (dealer !== '' && initialChips !== '') {
+		if (players.length > 1) {
 			sendAction({ action: 'start_game', name, amount: 0 });
 		} else {
-			console.log("Need to specify first dealer and initial chips")
+			console.log("Need at least 2 players to play")
 		}
 	}
 
@@ -56,7 +57,7 @@
 <svelte:window on:beforeunload={handleLeave} />
 
 <p>Waiting Room</p>
-<p>Table ID: {tid}</p>
+<p>Table ID: {tid.toUpperCase()}</p>
 <p>You are {name}{host ? ' and you are host' : ', waiting for host to start game'}</p>
 {#if host}
 	<Button text="Start Game" onClick={handleStart} />

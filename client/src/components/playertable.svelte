@@ -41,18 +41,19 @@
 							arrowPressed(name, 1);
 						}}><Icon icon="ic:baseline-arrow-drop-down" inline={false} /></button
 					>
-					Seat {spot + 1}: {name} {is_dealer ? ' - First Dealer' : ''}
+					Seat {spot + 1}: {name}
+					{is_dealer ? ' - First Dealer' : ''}
 					{#if !is_dealer}
-					<button
-						class="dealer"
-						on:click={() => {
-							makeDealer(name);
-						}}>Make First Dealer</button
-					>
+						<button
+							class="dealer"
+							on:click={() => {
+								makeDealer(name);
+							}}>Make First Dealer</button
+						>
 					{/if}
 					{#if !is_host}
 						<button class="kick" on:click={() => kick(name)}>kick</button>
-						{/if}
+					{/if}
 				</li>
 			{/each}
 		</ul>
@@ -60,8 +61,8 @@
 		<ul>
 			{#each sortBy(players, (p) => {
 				return p.spot;
-			}) as { name, spot }}
-				<li>Seat {spot + 1}: {name}</li>
+			}) as { name, spot, is_dealer }}
+				<li>Seat {spot + 1}: {name} {is_dealer ? ' - Dealer' : ''}</li>
 			{/each}
 		</ul>
 	{:else if view === 'table'}

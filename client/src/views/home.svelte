@@ -2,7 +2,7 @@
 	import { tableId } from '../scripts/store';
 	import Button from '../components/button.svelte';
 	import Input from '../components/input.svelte';
-	import { connect, getTableExists } from '../scripts/ws';
+	import { connect, getTableExists, getNewGame } from '../scripts/ws';
 
 	let tid: string = '';
 	let errorMessage = '';
@@ -16,11 +16,17 @@
 			errorMessage = `Table with id ${tid} does not exist`;
 		}
 	}
+
+	async function handleHost(): Promise<void> {
+		tid = await getNewGame();
+		tableId.set(tid);
+		connect(tid);
+	}
 </script>
 
 <div>
 	<p>{errorMessage}</p>
-	<Button text="Host" />
-	<Input bind:val={tid} onEnter={handleJoin} helperText="Enter Table ID" />
+	<Button text="Host" onClick={handleHost} />
+	<Input bind:val={tid} onEnter={handleJoin} helperText="Table ID" className="uppercase" />
 	<Button text="Join" onClick={handleJoin} />
 </div>

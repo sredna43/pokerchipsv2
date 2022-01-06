@@ -2,7 +2,7 @@
     export let disabled = false;
     export let text = "";
     export let onClick = () => {
-        console.log("default on click");
+        console.log(text);
     };
     export let variant = 'primary-filled';
 </script>

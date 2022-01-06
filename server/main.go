@@ -22,7 +22,7 @@ type WsErrorResponse struct {
 	Message string `json:"message"`
 }
 
-type CheckLobbyResponse struct {
+type TableCheckResponse struct {
 	Exists bool `json:"exists"`
 }
 
@@ -70,7 +70,7 @@ func main() {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		tableId := c.Param("tableId")
 		_, ok := Servers[tableId]
-		c.JSON(200, &CheckLobbyResponse{Exists: ok})
+		c.JSON(200, &TableCheckResponse{Exists: ok})
 	})
 
 	router.GET("/ws", func(c *gin.Context) {

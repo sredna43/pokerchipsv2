@@ -14,13 +14,10 @@ type Request struct {
 }
 
 type Response struct {
-	Requester string                    `json:"requester"`
-	Players   map[string]*models.Player `json:"players"`
-	Message   string                    `json:"message"`
-	Pot       int                       `json:"pot"`
-	WhoseTurn int                       `json:"whose_turn"`
-	Dealer    string                    `json:"dealer"`
-	Error     bool                      `json:"error"`
+	Requester string        `json:"requester"`
+	Message   string        `json:"message"`
+	Error     bool          `json:"error"`
+	Table     *models.Table `json:"table"`
 }
 
 func handleRequest(t *models.Table, r []byte) []byte {
@@ -29,6 +26,7 @@ func handleRequest(t *models.Table, r []byte) []byte {
 	if err := json.Unmarshal(r, req); err != nil {
 		res.Message = "Error: " + err.Error()
 	}
+
 	res.Requester = req.PlayerName
 
 	switch req.Action {
@@ -74,21 +72,65 @@ func handleRequest(t *models.Table, r []byte) []byte {
 			res.Message = "Could not start game, already playing"
 			res.Error = true
 		}
+	case "check":
+		if t.Check(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s checks", req.PlayerName)
+		} else {
+			res.Message = "Could not check"
+			res.Error = true
+		}
+	case "bet":
+		if t.Bet(req.PlayerName, req.Amount) {
+			res.Message = fmt.Sprintf("%s bets %d", req.PlayerName, req.Amount)
+		} else {
+			res.Message = "Could not bet"
+			res.Error = true
+		}
+	case "call":
+		if t.Call(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s calls", req.PlayerName)
+		} else {
+			res.Message = "Could not call"
+			res.Error = true
+		}
+	case "raise":
+		if t.Raise(req.PlayerName, req.Amount) {
+			res.Message = fmt.Sprintf("%s raises %d", req.PlayerName, req.Amount)
+		} else {
+			res.Message = "Could not raise"
+			res.Error = true
+		}
+	case "fold":
+		if t.Fold(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s folds", req.PlayerName)
+		} else {
+			res.Message = "Could not fold"
+			res.Error = true
+		}
+	case "win_round":
+		if t.WinRound(req.PlayerName) {
+			res.Message = fmt.Sprintf("%s wins the round", req.PlayerName)
+		} else {
+			res.Message = "Could not choose winner"
+			res.Error = true
+		}
+	case "new_round":
+		if t.NewRound() {
+			res.Message = "NEW_ROUND"
+		} else {
+			res.Message = "Could not start new round"
+			res.Error = true
+		}
 	case "game_state":
-		res.Players = t.Players
-		res.Pot = t.Pot
-		res.WhoseTurn = t.WhoseTurn
-		res.Dealer = t.Dealer
 		res.Message = "current gamestate"
 	default:
 		res.Message = "Unknown action: " + req.Action + " :: " + string(r)
 		res.Error = true
 	}
 
-	res.Players = t.Players
-	res.Dealer = t.Dealer
-	res.Pot = t.Pot
-	res.WhoseTurn = t.WhoseTurn
+	if !res.Error {
+		res.Table = t
+	}
 
 	if b, err := json.Marshal(res); err != nil {
 		return []byte("Error building response")

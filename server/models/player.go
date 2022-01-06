@@ -6,4 +6,5 @@ type Player struct {
 	IsDealer bool   `json:"is_dealer"`
 	Chips    int    `json:"chips"`
 	Spot     int    `json:"spot"`
+	Folded   bool   `json:"folded"`
 }

@@ -24,10 +24,10 @@
 				view = 'home';
 				break;
 			}
-            case 'START_GAME': {
-                view = 'table';
-                break;
-            }
+			case 'START_GAME': {
+				view = 'table';
+				break;
+			}
 			default: {
 				break;
 			}
@@ -53,14 +53,16 @@
 	<Button text="reset test table" onClick={handleReset} />
 {/if}
 
-<h1>Online Poker Chips</h1>
+<div class="app">
+	<h1>Online Poker Chips</h1>
 
-{#if view === 'home'}
-	<Home />
-{:else if view === 'entername'}
-	<Entername />
-{:else if view === 'waitingroom'}
-	<Waitingroom />
-{:else if view === 'table'}
-	<Table />
-{/if}
+	{#if view === 'home'}
+		<Home />
+	{:else if view === 'entername'}
+		<Entername />
+	{:else if view === 'waitingroom'}
+		<Waitingroom />
+	{:else if view === 'table'}
+		<Table />
+	{/if}
+</div>
