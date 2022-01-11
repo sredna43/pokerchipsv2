@@ -22,6 +22,7 @@ export interface Table {
     can_check: boolean;
     betting_round: number;
     current_bet: number;
+	hand_won: boolean;
 }
 
 export interface Player {

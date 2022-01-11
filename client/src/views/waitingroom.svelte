@@ -19,7 +19,6 @@
 	let initialChips: string;
 	let host = false;
 	let players: Player[];
-	let dealer: string;
 	sResponse.subscribe((r) => {
 		if (r.table?.players && r.table.players[name]?.is_host) {
 			isHost.set(true);
@@ -30,7 +29,6 @@
 			players = names.map((name): Player => {
 				return r.table.players[name];
 			})
-			dealer = r.table.dealer;
 			initialChips = String(r.table.initial_chips)
 		}
 	});

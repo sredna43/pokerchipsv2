@@ -27,8 +27,8 @@
 						foldedPlayers += 1;
 					}
 				});
-				if (foldedPlayers === (names.length - 1)) {
-					sendAction({action: 'win_round', amount: 0, name})
+				if (foldedPlayers === (names.length - 1) && !r.table.hand_won) {
+					sendAction({ action: 'win_round', amount: 0, name })
 				}
 				if (r.table.can_check) {
 					availableActions = 'cbf';
