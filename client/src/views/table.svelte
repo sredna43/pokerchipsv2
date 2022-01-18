@@ -35,6 +35,8 @@
 				} else {
 					availableActions = 'crf';
 				}
+			} else if (r.table.hand_won){
+				availableActions = 'hw';
 			} else {
 				availableActions = 'nyt';
 			}

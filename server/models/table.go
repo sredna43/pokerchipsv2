@@ -95,6 +95,7 @@ func (t *Table) SetInitialChips(amount int) bool {
 	for _, p := range t.Players {
 		p.Chips = amount
 	}
+	t.InitialChips = amount
 	return true
 }
 
