@@ -56,6 +56,7 @@ function parseResponse(m: string): void {
 
 function sendMessage(m: string): void {
 	if (socket.readyState === WebSocket.OPEN && browser) {
+		console.log(m);
 		socket.send(m);
 	}
 }

@@ -16,6 +16,7 @@ export interface Table {
     players: Players;
     whose_turn: number;
     dealer: string;
+	dealer_spot: string;
     pot: number;
 	playing: boolean;
     initial_chips: number;
@@ -32,6 +33,7 @@ export interface Player {
 	chips: number;
 	spot: number;
     folded: boolean;
+	called: boolean;
 }
 
 export interface Players {

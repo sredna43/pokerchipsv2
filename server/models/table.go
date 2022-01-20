@@ -6,6 +6,7 @@ type Table struct {
 	Players      map[string]*Player `json:"players"`
 	WhoseTurn    int                `json:"whose_turn"`
 	Dealer       string             `json:"dealer"`
+	DealerSpot   int                `json:"dealer_spot"`
 	Pot          int                `json:"pot"`
 	Playing      bool               `json:"playing"`
 	InitialChips int                `json:"initial_chips"`
@@ -22,6 +23,7 @@ func NewTable(id string) *Table {
 		Players:      make(map[string]*Player),
 		WhoseTurn:    0,
 		Dealer:       "",
+		DealerSpot:   0,
 		Pot:          0,
 		Playing:      false,
 		InitialChips: 1000,
@@ -83,6 +85,9 @@ func (t *Table) MovePlayer(name string, direction int) bool {
 				p.Spot = newSpot
 			}
 		}
+		if player.IsDealer {
+			t.DealerSpot = player.Spot
+		}
 		return true
 	}
 	return false
@@ -106,6 +111,7 @@ func (t *Table) SetDealer(newDealer string) bool {
 	if p, ok := t.Players[newDealer]; ok {
 		t.Dealer = newDealer
 		p.IsDealer = true
+		t.DealerSpot = p.Spot
 		return true
 	}
 	return false
@@ -122,21 +128,23 @@ func (t *Table) StartGame() bool {
 		for _, p := range t.Players {
 			p.Chips = t.InitialChips
 			p.Folded = false
+			if p.IsDealer {
+				t.DealerSpot = p.Spot
+			}
 		}
 		return true
 	}
 	return false
 }
 
-func (t *Table) NextTurn() {
+func (t *Table) NextTurn(raise bool) {
 	t.WhoseTurn += 1
 	if t.WhoseTurn == len(t.Players) {
 		t.WhoseTurn = 0
-		t.BettingRound += 1
 	}
 	for _, p := range t.Players {
 		if p.Spot == t.WhoseTurn && p.Folded {
-			t.NextTurn()
+			t.NextTurn(false)
 		}
 	}
 }
@@ -145,7 +153,7 @@ func (t *Table) Check(name string) bool {
 	if !t.CanCheck || t.WhoseTurn != t.Players[name].Spot || t.HandWon {
 		return false
 	}
-	t.NextTurn()
+	t.NextTurn(false)
 	return true
 }
 
@@ -158,7 +166,7 @@ func (t *Table) Bet(name string, amount int) bool {
 	t.Pot += amount
 	t.CanCheck = false
 	p.Chips -= amount
-	t.NextTurn()
+	t.NextTurn(false)
 	return true
 }
 
@@ -170,7 +178,7 @@ func (t *Table) Call(name string) bool {
 	t.Pot += t.CurrentBet
 	t.CanCheck = false
 	p.Chips -= t.CurrentBet
-	t.NextTurn()
+	t.NextTurn(false)
 	return true
 }
 
@@ -182,7 +190,7 @@ func (t *Table) Raise(name string, amount int) bool {
 	t.Pot += t.CurrentBet + amount
 	t.CanCheck = false
 	p.Chips -= (t.CurrentBet + amount)
-	t.NextTurn()
+	t.NextTurn(true)
 	return true
 }
 
@@ -192,7 +200,7 @@ func (t *Table) Fold(name string) bool {
 		return false
 	}
 	p.Folded = true
-	t.NextTurn()
+	t.NextTurn(false)
 	return true
 }
 
@@ -208,7 +216,8 @@ func (t *Table) WinRound(name string) bool {
 
 func (t *Table) NewRound() bool {
 	var nextDealer string
-	newDealerSpot := t.Players[t.Dealer].Spot + 1
+	t.DealerSpot += 1
+	newDealerSpot := t.DealerSpot
 	if newDealerSpot == len(t.Players) {
 		newDealerSpot = 0
 	}

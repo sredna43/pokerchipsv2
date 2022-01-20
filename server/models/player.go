@@ -7,4 +7,5 @@ type Player struct {
 	Chips    int    `json:"chips"`
 	Spot     int    `json:"spot"`
 	Folded   bool   `json:"folded"`
+	Called   bool   `json:"called"`
 }

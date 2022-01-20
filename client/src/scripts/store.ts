@@ -6,3 +6,7 @@ export const tableId = writable('');
 export const myName = writable('');
 export const isHost = writable(false);
 export const sResponse = writable({} as Res);
+
+sResponse.subscribe((r) => {
+    console.log(r.table);
+})

@@ -22,9 +22,9 @@
 	});
 
 	function handleName(): void {
-		myName.set(name);
+		myName.set(name.replace(/\s+/g, ''));
 		sendAction({
-			name: name,
+			name: name.replace(/\s+/g, ''),
 			action: 'add_player',
 			amount: 0
 		});

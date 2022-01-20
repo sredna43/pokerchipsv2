@@ -60,7 +60,7 @@
 {#if host}
 	<Button text="Start Game" onClick={handleStart} />
 	<Button text="Set Initial Chips" onClick={handleInitialChips} />
-	<Input bind:val={initialChips} helperText="Initial chips" />
+	<Input bind:val={initialChips} helperText="Initial chips" onEnter={handleInitialChips} />
 {/if}
 <Playertable bind:players mutable={host}/>
 <Button text="Leave" onClick={handleLeave} />
